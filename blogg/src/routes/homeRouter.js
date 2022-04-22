@@ -1,23 +1,18 @@
 const express = require("express");
-const _ = require("lodash");
 const Post = require("../models/post")
 
 const router = express.Router();
 
-const posts = [];
-
 router.get("/", (req,res) => {
     // TODO async/await
-    /*Post.find({title: "day1"}, (err, allPosts) => {
-        if(err)
+    Post.find({}, (err, allPosts) => {
+        if(err){
             console.log(err);
-        console.log(allPosts);
-        
-        });
-    });*/
-    res.render("home.ejs", {
-        homeText: "welcome",
-        posts: posts});
+        }
+        res.render("home.ejs", {
+            homeText: "welcome",
+            posts: allPosts});
+     });
     
 })
 
@@ -29,33 +24,34 @@ router.get("/contact", (req,res) => {
     res.render("contact.ejs", {contactText: "contact info"});
 })
 
-router.get("/styl.css", (req,res) => {
-    return readFile()
-    res.render("contact.ejs", {contactText: "contact info"});
-})
-
 router
     .get("/compose", (req,res) => {
         res.render("compose.ejs");
     })
     .post("/compose", (req,res) => {
-        const post = {
+        // const options = {year: 'numeric', month: 'long', day: 'numeric' };
+        // const date = new Date().toLocalDateString('en-GB', options);
+
+        const post = new Post({
             title: req.body.postTitle,
-            content: req.body.postBody
-        };
-        console.log(post);
+            content: req.body.postBody,
+        });
         // TODO async/await
-        //post.save;
-        posts.push(post);
+        post.save((err) => {if(err){console.log("+++",err)};});
         res.redirect("/");
     })
 
 router.get("/posts/:postId", (req, res) => {
     const {postId} = req.params;
-    posts.forEach(post => {
-        if(_.lowerCase(post.title) === _.lowerCase(postId))
-            res.render("post.ejs", {post: post});
-    })
+    // TODO asinc/await
+    Post.findById(postId, (err, post) => {
+        if(err){
+            console.log(err);
+        }
+        
+        res.render("post.ejs", {post: post});
+     });
+    
 })
 
 module.exports = router;
