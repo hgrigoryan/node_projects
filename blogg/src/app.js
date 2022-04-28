@@ -23,4 +23,5 @@ app.use(express.static(path.join(__dirname, "public")));
 
 main();
 app.use("/", homeRouter);
+
 app.listen(3000, () => console.log("Starting server on port 3000..."));

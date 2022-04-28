@@ -2,6 +2,13 @@
     padding-top: 70px;
     padding-bottom: 70px;
 }
+
+.container-outh{
+    margin: 130px auto;
+    width: 25%;
+
+}
+
 .navbar {
     padding-top: 15px;
     padding-bottom: 15px;
@@ -12,6 +19,10 @@
     letter-spacing: 5px;
 }
 .navbar-nav  li a:hover {
+    color: #1abc9c;
+}
+
+.navbar-default .navbar-brand {
     color: #1abc9c;
 }
 
@@ -37,4 +48,9 @@
 .post-date {
     margin-top: 20px;
     padding-left: 65%;
+}
+
+.login{
+    margin-right: 30px;
+    padding: 6px 24px;
 }
