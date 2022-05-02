@@ -1,19 +1,26 @@
 const Post = require("../models/post")
+const {NotFoundError} = require("../utils/HttpError")
 
 async function showAllPosts(req, res){
     try {
         const allPosts = await Post.find({});
         if(allPosts === null){
-            res.status("204");
+            throw new NotFoundError;
         }
-        res.status("200");
-        res.render("home.ejs", {
+        res.status("200").render("home.ejs", {
             homeText: "welcome",
-            posts: allPosts});
+            posts: allPosts
+        });
 
-    }catch(err){
-        res.ststus("500").json({
-            error: "Internal server error."
+    } catch(err) {
+        const statusCode = "500";
+        const message = "Internal server error."
+        if(err instanceof NotFoundError){
+            statusCode = err.statusCode;
+            message = err.message;
+        }
+        res.status(statusCode).json({
+            error: message
         });
     }
 }

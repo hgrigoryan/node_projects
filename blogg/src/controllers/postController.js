@@ -1,20 +1,25 @@
 const Post = require("../models/post")
+const {NotFoundError} = require("../utils/HttpError")
 
 async function findPostById(req, res){
     try{
         const {postId} = req.params;
         const post = await Post.findById(postId);
         if (null === post){
-            res.status("404");
-            // TODO: error classes needed
-            throw Error('Not found');
+            throw new NotFoundError;
         }
 
-        res.status("200");
-        res.render("post.ejs", {post: post});
+        res.status("200").render("post.ejs", {post: post});
+
     }catch(err){
-        res.ststus("500").json({
-            error: "Internal server error."
+        const statusCode = "500";
+        const message = "Internal server error."
+        if(err instanceof NotFoundError){
+            statusCode = err.statusCode;
+            message = err.message;
+        }
+        res.status(statusCode).json({
+            error: message
         });
     }
 }

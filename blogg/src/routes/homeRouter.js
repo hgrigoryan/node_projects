@@ -6,6 +6,7 @@ const contactController = require("../controllers/contactController");
 const composeController = require("../controllers/composeController");
 const postController = require("../controllers/postController");
 const outhController = require("../controllers/outhController");
+const verifyJWT = require("../middlewares/verifyJWT");
 
 const router = express.Router();
 
@@ -20,8 +21,8 @@ router.get("/", homeController);
 router.get("/about", aboutController);
 router.get("/contact", contactController);
 router
-    .get("/compose", composeController.showComposePage)
-    .post("/compose", composeController.saveNewPost);
+    .get("/compose", verifyJWT, composeController.showComposePage)
+    .post("/compose", verifyJWT, composeController.saveNewPost);
 router.get("/posts/:postId", postController);
 
 module.exports = router;

@@ -1,79 +1,94 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const {UsernameInUseError, EmailInUseError, EmptyFieldsError, UsernameOrPasswdordError} = require("../utils/HttpError")
+
 
 async function getRegistrationPage(req, res){
-    if(req.errorMessage !== undefined){
-        console.log("****1****");
-        res.render("register.ejs", {errorMessage: req.errorMessage});
-    }else{
-        console.log("****2****", req);
         res.render("register.ejs", {errorMessage: null});
-    }
     
 }
 
 async function register(req, res){
     try{
-        const nameInUse = await User.findOne({name: req.body.name});
-        const emailInUse = await User.findOne({email: req.body.email});
-        if(nameInUse !== null){
-            req.errorMessage = "Username already in use." ;
-            console.log("******3****");
-            return res.status("400").redirect("/register");
-        }else if(emailInUse !== null){
-            res.errorMessage = "Email already in use." ;
-            return res.status("400").redirect("/register")
+        const name = await User.findOne({name: req.body.name});
+        const email = await User.findOne({email: req.body.email});
+        if(!req.body.name || !req.body.email || !req.body.password){
+            throw new EmptyFieldsError;
+        }
+        if(name !== null){
+            throw new UsernameInUseError;
+        }
+        if(email !== null){
+            throw new EmailInUseError;
         }
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-        console.log("**********got to create user");
         const user =  new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword
+            name: req.body.name,
+            email: req.body.email,
+            password: hashedPassword
         });
         
-        console.log("**********got to save");
         await user.save();
 
-        //jwt.sign()
-        res.redirect("/");
+        const token = jwt.sign(user.name, process.env.ACCESS_TOKEN_SECRET);
+        res.cookie("AccessToken", token, { httpOnly: true} ).redirect("/");
 
-}catch(err){
-    console.log(err);
-    res.status("500").json({
-        error: "Internal server error."
-    });
+    }catch(err){
+        let statusCode;
+        let message;
+
+        if(err instanceof UsernameInUseError || err instanceof EmailInUseError || err instanceof EmptyFieldsError){
+            statusCode = err.statusCode;
+            message = err.message;
+            res.render("register.ejs", {errorMessage: message});
+            return;
+        }
+
+        statusCode = "500";
+        message = "Internal server error."
+        res.status(statusCode).json({
+            error: message
+        });
+    };
 }
 
-}
 
 async function getLoginPage(req, res){
-    if(res.errorMessage !== undefined){
-        console.log("*********", res.errorMessage);
-        res.render("login.ejs", {errorMessage: res.body.errorMessage});
-    }else{
-        res.render("login.ejs", {errorMessage: null});
-    }
+    res.render("login.ejs", {errorMessage: null});
 }
 
 async function login(req, res){
     try{
         const user =  await User.findOne({name: req.body.name});
         const passwordCheck = await bcrypt.compare(req.body.password, user.password);
-        // Check if such user exists
-        if(user === null || passwordCheck === false){
-            res.errorMessage = "Username or password is incorrect./nPlease try again." ;
-            res.status("400").redirect("/login");
+        if(!req.body.name || !req.body.password){
+            throw new EmptyFieldsError;
         }
+        if(user === null || passwordCheck === false){
+            throw new UsernameOrPasswdordError;
+        }
+
+        const token = jwt.sign(user.name, process.env.ACCESS_TOKEN_SECRET);
+        res.cookie("AccessToken", token, { httpOnly: true} );
         res.status("200").redirect("/");
-        
-    
+           
     }catch(err){
-        console.log(err);
-        res.status("500").json({
-            error: "Internal server error."
+        let statusCode;
+        let message;
+
+        if(err instanceof UsernameOrPasswdordError || err instanceof EmptyFieldsError){
+            statusCode = err.statusCode;
+            message = err.message;
+            res.render("login.ejs", {errorMessage: message});
+            return;
+        }
+
+        statusCode = "500";
+        message = "Internal server error."
+        res.status(statusCode).json({
+            error: message
         });
     }
     

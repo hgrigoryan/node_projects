@@ -13,11 +13,7 @@ async function saveNewPost(req, res){
             content: req.body.postBody,
         });
         await post.save();
-        res.status("201");
-        // .json({
-        //     message: "Post created successfully.",
-        //   });
-        res.redirect("/");
+        res.status("201").redirect("/");
 
     }catch(err){
         res.status("500").json({
