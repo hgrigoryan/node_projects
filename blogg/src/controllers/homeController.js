@@ -13,8 +13,8 @@ async function showAllPosts(req, res){
         });
 
     } catch(err) {
-        const statusCode = "500";
-        const message = "Internal server error."
+        let statusCode = "500";
+        let message = "Internal server error."
         if(err instanceof NotFoundError){
             statusCode = err.statusCode;
             message = err.message;

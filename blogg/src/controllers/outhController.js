@@ -11,11 +11,11 @@ async function getRegistrationPage(req, res){
 
 async function register(req, res){
     try{
-        const name = await User.findOne({name: req.body.name});
-        const email = await User.findOne({email: req.body.email});
         if(!req.body.name || !req.body.email || !req.body.password){
             throw new EmptyFieldsError;
         }
+        const name = await User.findOne({name: req.body.name});
+        const email = await User.findOne({email: req.body.email});
         if(name !== null){
             throw new UsernameInUseError;
         }
@@ -61,12 +61,12 @@ async function getLoginPage(req, res){
 
 async function login(req, res){
     try{
-        const user =  await User.findOne({name: req.body.name});
-        const passwordCheck = await bcrypt.compare(req.body.password, user.password);
         if(!req.body.name || !req.body.password){
             throw new EmptyFieldsError;
         }
-        if(user === null || passwordCheck === false){
+        const user =  await User.findOne({name: req.body.name});
+        // If username is in db check password
+        if(user === null || !(await bcrypt.compare(req.body.password, user.password))){
             throw new UsernameOrPasswdordError;
         }
 
@@ -86,7 +86,7 @@ async function login(req, res){
         }
 
         statusCode = "500";
-        message = "Internal server error."
+        message = "Internal server 1error."
         res.status(statusCode).json({
             error: message
         });
@@ -94,9 +94,15 @@ async function login(req, res){
     
 }
 
+async function logout(req, res){
+    res.cookie("AccessToken", "", { httpOnly: true} );
+    res.redirect("/");
+}
+
 module.exports = {
     getRegistrationPage, 
     register, 
     getLoginPage, 
-    login
+    login,
+    logout
 };

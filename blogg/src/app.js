@@ -3,8 +3,10 @@ const express = require("express");
 const path = require('path');
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
 const homeRouter = require("./routes/homeRouter");
-const cookieParser = require('cookie-parser')
+const outhRouter = require("./routes/outhRouter");
+
 
 require("dotenv").config()
 const app = express();
@@ -27,5 +29,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 main();
 app.use("/", homeRouter);
+app.use("/outh", outhRouter);
 
 app.listen(3000, () => console.log("Starting server on port 3000..."));

@@ -16,7 +16,7 @@ class NotFoundError extends Error {
 
 class UnauthorizedError extends Error {
     constructor() {
-      super("User is unauthorized");
+      super("Please login or register to be able to add a post.");
       this.name = "UnauthorizedError";
       this.statusCode = "401";
     }

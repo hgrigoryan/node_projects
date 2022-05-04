@@ -12,8 +12,8 @@ async function findPostById(req, res){
         res.status("200").render("post.ejs", {post: post});
 
     }catch(err){
-        const statusCode = "500";
-        const message = "Internal server error."
+        let statusCode = "500";
+        let message = "Internal server error."
         if(err instanceof NotFoundError){
             statusCode = err.statusCode;
             message = err.message;

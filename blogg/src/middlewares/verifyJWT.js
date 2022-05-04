@@ -14,18 +14,20 @@ function verifyJWT(req, res, next){
             if(err){
                 throw new UnauthorizedError;
             }else{
-                req.userName = userName;
+                req.authorized = true;
             }
 
         }); 
 
         next();
     }catch(err){
-        const statusCode = "500";
-        const message = "Internal server 1error."
+        let statusCode = "500";
+        let message = "Internal server error."
         if(err instanceof UnauthorizedError){
             statusCode = err.statusCode;
             message = err.message;
+            res.render("login.ejs", {errorMessage: message});
+            return;
         }
         res.status(statusCode).json({
             error: message

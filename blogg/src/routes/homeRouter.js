@@ -5,17 +5,9 @@ const aboutController = require("../controllers/aboutController");
 const contactController = require("../controllers/contactController");
 const composeController = require("../controllers/composeController");
 const postController = require("../controllers/postController");
-const outhController = require("../controllers/outhController");
 const verifyJWT = require("../middlewares/verifyJWT");
 
 const router = express.Router();
-
-router
-    .get("/register", outhController.getRegistrationPage)
-    .post("/register", outhController.register);
-router
-    .get("/login", outhController.getLoginPage)
-    .post("/login", outhController.login);
 
 router.get("/", homeController);
 router.get("/about", aboutController);

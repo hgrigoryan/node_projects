@@ -1,10 +1,10 @@
 <%- include('partials/outhHeader'); -%>
 <body>
     <div class="container-outh">
-    <% if(errorMessage === null){ %>
-        <p><%= errorMessage %></p>
+    <% if(errorMessage !== null){ %>
+        <p class="error-message"><%= errorMessage %></p>
     <%}%>
-    <form action="/login" method="post">
+    <form action="/outh/login" method="post">
         <div class="class="form-group"">
             <label for="name" class="form-label">Username</label>
             <input type="text" class="form-control" name="name"><br>
@@ -12,7 +12,7 @@
             <input type="password" class="form-control" name="password"><br>        
         </div>
         <input class="btn btn-primary login" type="submit" value="Login">
-        <a class="btn btn-primary" href="/register">Register</a>
+        <a class="btn btn-primary" href="/outh/register">Register</a>
     </form>
     </div>
 </body>
